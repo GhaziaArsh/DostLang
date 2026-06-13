@@ -1,0 +1,17 @@
+shuru
+    # Variable declarations using 'rakho'
+    rakho a = 10;
+    rakho b = 20.5;
+    rakho c = "Hello World";
+    rakho d = sach; # True boolean
+
+    # Printing variables
+    dikhao("a =", a);
+    dikhao("b =", b);
+    dikhao("c =", c);
+    dikhao("d =", d);
+
+    # Variable assignment update
+    a = a + 5;
+    dikhao("Updated a =", a);
+khatam

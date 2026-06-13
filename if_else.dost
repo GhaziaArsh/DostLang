@@ -1,0 +1,21 @@
+shuru
+    rakho score = 75;
+
+    # Basic if-else logic
+    agar score >= 50 {
+        dikhao("Pass! Mubarak ho.");
+    } warna {
+        dikhao("Fail! Dobara koshish karein.");
+    }
+
+    # Nested if conditions
+    agar score >= 80 {
+        dikhao("Grade: A");
+    } warna {
+        agar score >= 70 {
+            dikhao("Grade: B");
+        } warna {
+            dikhao("Grade: C or lower");
+        }
+    }
+khatam

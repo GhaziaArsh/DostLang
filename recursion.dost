@@ -1,0 +1,13 @@
+shuru
+    # Recursive function for factorial
+    kaam factorial(n) {
+        agar n <= 1 {
+            wapas 1;
+        } warna {
+            wapas n * factorial(n - 1);
+        }
+    }
+
+    rakho result = factorial(5);
+    dikhao("Factorial of 5 =", result); # Should print 120
+khatam

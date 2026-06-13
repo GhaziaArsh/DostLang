@@ -1,0 +1,18 @@
+shuru
+    rakho x = 10;
+    rakho y = 3;
+
+    # Basic arithmetic
+    dikhao("Addition:", x + y);
+    dikhao("Subtraction:", x - y);
+    dikhao("Multiplication:", x * y);
+    dikhao("Division:", x / y);
+    dikhao("Modulo:", x % y);
+    dikhao("Power:", x ^ y);
+
+    # Operator precedence and grouping
+    rakho expr1 = x + y * 2; # 10 + 6 = 16
+    rakho expr2 = (x + y) * 2; # 13 * 2 = 26
+    dikhao("Precedence 1:", expr1);
+    dikhao("Precedence 2:", expr2);
+khatam

@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ur">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DostLang - Schi Dosti, Schak Code</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Outfit:wght@300;400;600;700;800;900&family=Noto+Nastaliq+Urdu:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Style Sheet -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Monaco Editor Loader -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.39.0/min/vs/loader.min.js"></script>
+</head>
+<body>
+    <!-- Landing Screen -->
+    <div id="landing-screen" class="landing-container">
+        <div class="landing-glow"></div>
+        <div class="landing-glow-secondary"></div>
+        
+        <!-- Premium Navbar -->
+        <nav class="landing-nav">
+            <div class="nav-logo">
+                <span class="nav-logo-icon">✨</span>
+                <span class="nav-logo-text">dostlang</span>
+            </div>
+            <div class="nav-links">
+                <button id="docs-nav-btn" class="nav-link-btn">Docs</button>
+                <a href="https://github.com" target="_blank" class="nav-link-btn">GitHub</a>
+            </div>
+        </nav>
+
+        <div class="landing-hero-wrapper">
+            <!-- Left Side: Content & Actions -->
+            <div class="landing-hero-content">
+                <div class="tagline-badge">
+                    <span class="badge-dot"></span>
+                    Urdu/Hindi-Inspired Toy Programming Language
+                </div>
+                <h1 class="landing-title">
+                    schi dosti,<br><span class="gradient-text">scha code.</span>
+                </h1>
+                <p class="landing-description">
+                    Experience coding in a highly intuitive, fun, and Urdu-customized toy programming language built with Python. Start from scratch or load one of our interactive test templates.
+                </p>
+                
+                <div class="landing-actions">
+                    <button id="start-editor-btn" class="btn btn-primary btn-lg glow-button">
+                        Launch Playground <span class="btn-arrow">→</span>
+                    </button>
+                    <button id="docs-btn" class="btn btn-secondary btn-lg">
+                        📖 Documentation
+                    </button>
+                    <button id="view-source-btn" class="btn btn-secondary btn-lg">
+                        📂 View Source
+                    </button>
+                </div>
+
+                <div class="quick-samples-section">
+                    <h3 class="section-title">Select a Quick Start Template</h3>
+                    <div class="sample-grid">
+                        <div class="sample-card" data-sample="hello">
+                            <div class="sample-icon">👋</div>
+                            <div class="sample-info">
+                                <h4>Hello World</h4>
+                                <p>Assalam-o-Alaikum greeting</p>
+                            </div>
+                        </div>
+                        <div class="sample-card" data-sample="variables">
+                            <div class="sample-icon">📦</div>
+                            <div class="sample-info">
+                                <h4>Variables</h4>
+                                <p>rakho & value updates</p>
+                            </div>
+                        </div>
+                        <div class="sample-card" data-sample="if_else">
+                            <div class="sample-icon">⚖️</div>
+                            <div class="sample-info">
+                                <h4>Agar / Warna</h4>
+                                <p>Conditional logic flows</p>
+                            </div>
+                        </div>
+                        <div class="sample-card" data-sample="recursion">
+                            <div class="sample-icon">🌀</div>
+                            <div class="sample-info">
+                                <h4>Recursion</h4>
+                                <p>Factorial calculations</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="landing-author-credits">
+                    Crafted with ❤️ by <span class="author-name">Ghazia</span>, <span class="author-name">Javeria</span>, and <span class="author-name">Iqra</span>
+                </div>
+            </div>
+
+            <!-- Right Side: Beautiful Visual Preview Device -->
+            <div class="landing-hero-visual">
+                <div class="visual-card-wrapper">
+                    <div class="visual-card-glow"></div>
+                    <div class="visual-card">
+                        <div class="visual-header">
+                            <span class="window-dot red"></span>
+                            <span class="window-dot yellow"></span>
+                            <span class="window-dot green"></span>
+                            <span class="window-title">dostlang_demo.dost</span>
+                        </div>
+                        <div class="image-container">
+                            <img src="dostlang_hero.png" alt="DostLang Technology Banner" class="hero-image">
+                            <!-- Floating Code Snippet Card on top of image -->
+                            <div class="floating-code-snippet">
+                                <div class="snippet-line"><span class="c-key">shuru</span></div>
+                                <div class="snippet-line pad"><span class="c-var">rakho</span> dosti = <span class="c-str">"sach"</span>;</div>
+                                <div class="snippet-line pad"><span class="c-key">agar</span> dosti == <span class="c-str">"sach"</span> {</div>
+                                <div class="snippet-line pad2"><span class="c-print">dikhao</span>(<span class="c-str">"Mubarak ho!"</span>);</div>
+                                <div class="snippet-line pad2"><span class="c-print">dikhao</span>(<span class="c-str">"Schi Dosti, Scha Code!"</span>);</div>
+                                <div class="snippet-line pad}"><span class="c-key">}</span></div>
+                                <div class="snippet-line"><span class="c-key">khatam</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Documentation Modal Popup -->
+    <div id="docs-modal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2>Documentation</h2>
+                <button id="close-modal-btn" class="btn-close-modal">×</button>
+            </div>
+            <div class="modal-body docs-container">
+                <p class="docs-intro">dostlang is dynamically typed toy programming language, written in Python.</p>
+                
+                <hr class="docs-divider">
+
+                <h3>General</h3>
+                <p><code>shuru</code> is the entrypoint for the program and all program must end with <code>khatam</code>. Anything outside of it will be ignored.</p>
+                <pre class="code-view inline-code">This will be ignored
+
+shuru
+    # Write code here
+khatam
+
+This too</pre>
+
+                <hr class="docs-divider">
+
+                <h3>Variables</h3>
+                <p>Variables can be declared using <code>rakho</code>.</p>
+                <pre class="code-view inline-code">shuru
+    rakho a = 10;
+    rakho b = "two";
+    rakho c = 15;
+    a = a + 1;
+    b = "twenty one";
+    c = c * 2;
+khatam</pre>
+
+                <hr class="docs-divider">
+
+                <h3>Types</h3>
+                <p>Numbers and strings are like other languages. <code>sach</code> and <code>jhoot</code> are the boolean values.</p>
+                <pre class="code-view inline-code">shuru
+    rakho a = 10;
+    rakho b = 10 + (15*20);
+    rakho c = "two";
+    rakho d = 'ok';
+    rakho f = sach;
+    rakho g = jhoot;
+khatam</pre>
+
+                <hr class="docs-divider">
+
+                <h3>Built-ins</h3>
+                <p>Use <code>dikhao</code> to print anything to console.</p>
+                <pre class="code-view inline-code">shuru
+    dikhao("Hello World");
+    rakho a = 10;
+    {
+        rakho b = 20;
+        dikhao(a + b);
+    }
+    dikhao(5, 'ok', sach, jhoot);
+khatam</pre>
+
+                <hr class="docs-divider">
+
+                <h3>Conditionals</h3>
+                <p>DostLang supports conditional constructs. The <code>agar</code> block will execute if condition is <code>sach</code>, otherwise subsequently added nested <code>warna { agar ... }</code> blocks will execute if their condition is <code>sach</code>, and the fallback <code>warna</code> block will execute if all of the above conditions are <code>jhoot</code>.</p>
+                <pre class="code-view inline-code">shuru
+    rakho a = 10;
+    agar (a < 20) {
+        dikhao("a is less than 20");
+    } warna {
+        agar (a < 25) {
+            dikhao("a is less than 25");
+        } warna {
+            dikhao("a is greater than or equal to 25");
+        }
+    }
+khatam</pre>
+
+                <hr class="docs-divider">
+
+                <h3>Loops</h3>
+                <p>Statements inside <code>jabtak</code> blocks are executed as long as a specified condition evaluates to <code>sach</code>. If the condition becomes <code>jhoot</code>, statements within the loop stop executing.</p>
+                <pre class="code-view inline-code">shuru
+    rakho a = 0;
+    jabtak (a < 10) {
+        a = a + 1;
+        dikhao(a);
+    }
+    dikhao("done");
+khatam</pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Workspace (Initially Hidden) -->
+    <div id="workspace-screen" class="app-container hidden">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo-area">
+                <button id="back-home-btn" class="btn-back" title="Go back to home screen">🏠</button>
+                <div class="logo-text">
+                    <h1>dostlang <span class="badge font-glow">Playground</span></h1>
+                </div>
+            </div>
+            <div class="header-actions">
+                <div class="select-container">
+                    <label for="example-select">Change Code Template:</label>
+                    <select id="example-select">
+                        <option value="hello">Assalam-o-Alaikum (Hello World)</option>
+                        <option value="variables">Variables (Rakho)</option>
+                        <option value="arithmetic">Arithmetic Operations</option>
+                        <option value="if_else">Decision Making (Agar/Warna)</option>
+                        <option value="while_loop">Looping (Jabtak)</option>
+                        <option value="functions">Functions (Kaam)</option>
+                        <option value="recursion">Recursion (Factorial)</option>
+                        <option value="array_test">Array Operations</option>
+                    </select>
+                </div>
+                <button id="run-btn" class="btn btn-primary" title="Execute script (F5)">
+                    <span class="btn-icon">▶</span> Chalao
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Workspace Grid -->
+        <main class="workspace">
+            <!-- Left Pane: Editor -->
+            <section class="pane editor-pane">
+                <div class="pane-header">
+                    <h2>Code Editor</h2>
+                    <span class="file-name">main.dost</span>
+                </div>
+                <div class="editor-container" id="editor-root">
+                    <!-- Monaco editor loaded here -->
+                </div>
+            </section>
+
+            <!-- Right Pane: Outputs / Diagnostics -->
+            <section class="pane terminal-pane">
+                <div class="pane-header tabs-header">
+                    <button class="tab-btn active" data-tab="console">Output Console</button>
+                    <button class="tab-btn" data-tab="tokens">Tokens Stream</button>
+                    <button class="tab-btn" data-tab="ast">AST Structure</button>
+                    <button class="tab-btn" data-tab="ir">IR Code (TAC)</button>
+                    <button class="tab-btn" data-tab="symbol-table">Symbol Table</button>
+                    <button id="clear-btn" class="btn-clear" title="Clear Outputs">🧹 Clear</button>
+                </div>
+                <div class="tabs-content">
+                    <!-- Console Output Tab -->
+                    <div class="tab-content active" id="tab-console">
+                        <div class="console-box" id="console-output">
+                            <span class="system-msg">Press "Chalao" to execute your code...</span>
+                        </div>
+                    </div>
+
+                    <!-- Tokens Tab -->
+                    <div class="tab-content" id="tab-tokens">
+                        <div class="table-wrapper">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Token Type</th>
+                                        <th>Lexeme / Value</th>
+                                        <th>Line</th>
+                                        <th>Position</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tokens-body">
+                                    <tr><td colspan="4" class="empty-table-msg">Run program to see tokens</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- AST Tab -->
+                    <div class="tab-content" id="tab-ast">
+                        <pre class="code-view" id="ast-output">Run program to see Abstract Syntax Tree structure...</pre>
+                    </div>
+
+                    <!-- IR Tab -->
+                    <div class="tab-content" id="tab-ir">
+                        <pre class="code-view" id="ir-output">Run program to see Intermediate Representation (TAC)...</pre>
+                    </div>
+
+                    <!-- Symbol Table Tab -->
+                    <div class="tab-content" id="tab-symbol-table">
+                        <div class="table-wrapper">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Identifier</th>
+                                        <th>Type</th>
+                                        <th>Scope</th>
+                                        <th>Current Value</th>
+                                        <th>Line</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="symbol-table-body">
+                                    <tr><td colspan="5" class="empty-table-msg">Run program to inspect symbol table</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer / Status Bar -->
+        <footer class="app-footer">
+            <div class="status-item">
+                <span class="status-dot green"></span>
+                <span id="compiler-status">Ready</span>
+            </div>
+            <div class="status-item">
+                <span>Language: <strong>dostlang v1.0</strong></span>
+            </div>
+            <div class="status-item font-nastaliq">
+                <span>دوست لینگ - سچی دوستی، سچا کوڈ</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Script File -->
+    <script src="app.js"></script>
+</body>
+</html>

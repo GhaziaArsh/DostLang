@@ -1,0 +1,40 @@
+shuru
+    # 1. Variables and Types
+    rakho welcome = "DostLang Test Runner";
+    dikhao(welcome);
+
+    # 2. Arithmetic & Logic
+    rakho limit = 10;
+    rakho counter = 1;
+    rakho sum = 0;
+
+    # 3. Loops and Conditionals
+    jabtak counter <= limit {
+        # Sum odd numbers, subtract even ones
+        agar counter % 2 == 1 {
+            sum = sum + counter;
+        } warna {
+            sum = sum - counter;
+        }
+        counter = counter + 1;
+    }
+    dikhao("Sum alternating 1..10 =", sum);
+
+    # 4. Functions & Closures
+    kaam checkThreshold(val, threshold) {
+        agar val > threshold {
+            wapas sach;
+        } warna {
+            wapas jhoot;
+        }
+    }
+    
+    rakho isOver = checkThreshold(sum, 0);
+    dikhao("Is sum positive?", isOver);
+
+    # 5. Arrays
+    rakho scores = [12, 45, 67];
+    dikhao("Initial scores array:", scores);
+    scores[1] = scores[0] + scores[2];
+    dikhao("Modified scores array:", scores);
+khatam

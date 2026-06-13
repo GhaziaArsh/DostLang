@@ -1,0 +1,9 @@
+shuru
+    rakho i = 1;
+    
+    # Loop from 1 to 5
+    jabtak i <= 5 {
+        dikhao("Iteration count:", i);
+        i = i + 1;
+    }
+khatam

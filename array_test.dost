@@ -1,0 +1,15 @@
+shuru
+    # Array literal declaration
+    rakho arr = [10, 20, 30, 40];
+
+    # Array access
+    dikhao("Element at index 0:", arr[0]);
+    dikhao("Element at index 2:", arr[2]);
+
+    # Array value update
+    arr[1] = 99;
+    dikhao("Updated element at index 1:", arr[1]);
+    
+    # Complete array printing
+    dikhao("Entire array:", arr);
+khatam

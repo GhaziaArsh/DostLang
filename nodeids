@@ -1,0 +1,9 @@
+[
+  "tests/test_compiler.py::test_interpreter_execution",
+  "tests/test_compiler.py::test_ir_generation",
+  "tests/test_compiler.py::test_lexer",
+  "tests/test_compiler.py::test_parser",
+  "tests/test_compiler.py::test_recursive_function",
+  "tests/test_compiler.py::test_semantic_analysis_success",
+  "tests/test_compiler.py::test_semantic_analysis_undeclared_error"
+]

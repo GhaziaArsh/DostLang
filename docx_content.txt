@@ -1,0 +1,310 @@
+DostLang Compiler and Interpreter — Implementation Plan
+A complete, production-quality compiler construction project for DostLang, a custom Urdu/Hindi-inspired programming language.
+Project Overview
+DostLang demonstrates all classical phases of compiler construction: Lexical Analysis → Syntax Analysis → AST Generation → Semantic Analysis → Symbol Table → IR Generation → Interpretation/Execution
+Tech Stack: Python 3.12+, PLY (lex-yacc), Tkinter, Graphviz, SQLite
+Proposed Changes
+1. Core Language Infrastructure
+[NEW] 
+ast_nodes.py
+AST node classes for the entire language:
+ProgramNode — wraps body between shuru/khatam
+VarDeclNode — rakho x = expr;
+AssignNode — x = expr;
+BinOpNode — arithmetic & comparison (+, -, *, /, %, ^, ==, !=, >, <, >=, <=)
+UnaryOpNode — unary minus, logical not
+NumberNode, StringNode, BoolNode, IdentifierNode — literals & identifiers
+PrintNode — dikhao(expr)
+InputNode — pocho name;
+IfNode — agar/warna with optional else
+WhileNode — jabtak cond { body }
+FuncDefNode — kaam name(params) { body }
+FuncCallNode — name(args)
+ReturnNode — wapas expr;
+ArrayDeclNode, ArrayAccessNode — array support (extra feature)
+ForNode — for loop support (extra feature)
+CommentNode — single & multi-line comments
+Each node stores line and col for error reporting.
+[NEW] 
+lexer.py
+PLY-based lexical analyzer. Token types:
+CategoryTokens
+KeywordsSHURU, KHATAM, RAKHO, DIKHAO, POCHO, AGAR, WARNA, JABTAK, KAAM, WAPAS, SACH, JHOOT
+LiteralsNUMBER_INT, NUMBER_FLOAT, STRING
+IdentifiersID
+ArithmeticPLUS, MINUS, TIMES, DIVIDE, MODULO, POWER
+ComparisonEQ, NEQ, GT, LT, GTE, LTE
+AssignmentASSIGN
+DelimitersLPAREN, RPAREN, LBRACE, RBRACE, LBRACKET, RBRACKET, SEMICOLON, COMMA
+LogicalAND, OR, NOT
+Handles single-line (#) and multi-line (### ... ###) comments. Tracks line numbers and column positions. Reports lexical errors with position info.
+[NEW] 
+parser.py
+PLY yacc-based parser. Grammar rules (simplified BNF):
+program        → SHURU stmt_list KHATAM
+stmt_list      → stmt stmt_list | ε
+stmt           → var_decl | assignment | print_stmt | input_stmt
+               | if_stmt | while_stmt | func_def | return_stmt | func_call SEMICOLON | expr SEMICOLON
+var_decl       → RAKHO ID ASSIGN expr SEMICOLON
+assignment     → ID ASSIGN expr SEMICOLON
+print_stmt     → DIKHAO LPAREN expr_list RPAREN SEMICOLON
+input_stmt     → POCHO ID SEMICOLON
+if_stmt        → AGAR expr LBRACE stmt_list RBRACE (WARNA LBRACE stmt_list RBRACE)?
+while_stmt     → JABTAK expr LBRACE stmt_list RBRACE
+func_def       → KAAM ID LPAREN param_list RPAREN LBRACE stmt_list RBRACE
+func_call      → ID LPAREN arg_list RPAREN
+return_stmt    → WAPAS expr SEMICOLON
+expr           → expr binop expr | unaryop expr | LPAREN expr RPAREN
+               | NUMBER | STRING | SACH | JHOOT | ID | func_call | array_access
+Operator precedence: ^ > * / % > + - > comparisons > logical. Error recovery with p_error() providing meaningful messages.
+[NEW] 
+symbol_table.py
+Scope-aware symbol table with fields:
+FieldDescription
+nameVariable/function name
+typeint, float, string, bool, function
+scopeScope name (e.g., global, add, if_1)
+valueCurrent value
+lineDeclaration line number
+Features:
+Nested scope stack (push/pop)
+declare(), lookup(), update(), get_all() methods
+Scope chain resolution (inner → outer lookup)
+[NEW] 
+semantic.py
+Semantic analysis pass over the AST:
+Variable declaration checking — flag undeclared variables
+Duplicate variable detection — flag re-declarations in the same scope
+Type checking — validate operations (e.g., no string + int)
+Function existence checking — flag calls to undefined functions
+Arity checking — verify argument counts match parameter counts
+Scope management — enter/exit scopes for functions, if, while
+Return statement validation — ensure returns are inside functions
+Collects all errors as a list with line numbers
+[NEW] 
+ir_generator.py
+Three-address code (TAC) generator:
+Generates temporaries t1, t2, ... for intermediate results
+Labels L1, L2, ... for control flow
+Operations: t1 = a + b, IF t1 GOTO L2, GOTO L3, PARAM x, CALL func, RETURN val
+Outputs human-readable TAC listing
+[NEW] 
+interpreter.py
+Tree-walking interpreter that directly executes the AST:
+Separate environment stack from symbol table (runtime vs. compile-time)
+Variable storage with nested scopes
+Arithmetic evaluation with type coercion
+Function calls with parameter binding and local scope
+Loop execution with break detection
+Input handling (reads from stdin or GUI input)
+Runtime error handling with clear messages
+Output capture for GUI display
+[NEW] 
+visualizer.py
+AST and Parse Tree visualization using Graphviz:
+generate_ast_graph(ast) → DOT → PNG/SVG
+generate_parse_tree(ast) → DOT → PNG/SVG
+Each node labeled with type and value
+Color-coded by node type (statements=blue, expressions=green, literals=orange, etc.)
+Saves to outputs/ directory
+[NEW] 
+database.py
+SQLite database for execution history:
+sql
+CREATE TABLE executions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    source_code TEXT,
+    output TEXT,
+    tokens TEXT,
+    ir_code TEXT,
+    status TEXT,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE errors (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    execution_id INTEGER,
+    error_type TEXT,
+    message TEXT,
+    line_number INTEGER,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (execution_id) REFERENCES executions(id)
+);
+2. GUI IDE
+[NEW] 
+gui.py
+Modern Tkinter IDE with dark theme:
+Code Editor — text widget with line numbers, syntax highlighting for all DostLang keywords
+Toolbar — New, Open, Save, Run buttons
+Tab-based output panels:
+Token Stream — table of all tokens
+Parse Tree — text or image viewer
+AST Viewer — Graphviz rendering
+Symbol Table — formatted table
+IR Code — three-address code listing
+Output Console — program output
+Error Console — all errors with line numbers
+Syntax highlighting — keywords (blue), strings (green), numbers (orange), comments (gray)
+Status bar — file name, cursor position, execution status
+3. Entry Point
+[NEW] 
+main.py
+CLI mode: python main.py program.dost — run a DostLang file
+GUI mode: python main.py (no args) — launch the IDE
+Pipeline: source → lexer → parser → semantic → IR → execute
+Error reporting at each phase
+4. Tests & Examples
+[NEW] 
+tests/
+test_lexer.py — unit tests for tokenization
+test_parser.py — unit tests for parsing
+test_semantic.py — unit tests for semantic analysis
+test_interpreter.py — integration tests for execution
+test_programs.py — runs all 20+ example programs
+[NEW] 
+examples/
+20+ sample .dost programs:
+hello.dost — basic print
+variables.dost — variable declaration
+arithmetic.dost — all arithmetic ops
+input_output.dost — user input
+if_else.dost — basic conditionals
+nested_if.dost — nested conditionals
+while_loop.dost — basic loop
+nested_loop.dost — nested loops
+functions.dost — function definition & call
+recursion.dost — recursive factorial
+string_ops.dost — string concatenation
+boolean_logic.dost — boolean expressions
+comparison.dost — all comparison operators
+scope_test.dost — variable scoping
+fibonacci.dost — Fibonacci sequence
+calculator.dost — simple calculator
+pattern.dost — pattern printing
+array_test.dost — array operations
+comprehensive.dost — all features combined
+error_examples.dost — intentional errors for testing
+5. Documentation
+[NEW] 
+README.md
+Complete documentation: overview, architecture diagram, installation, grammar, tokens, AST design, semantic rules, examples, and future enhancements.
+[NEW] 
+docs/
+grammar.md — formal grammar specification
+architecture.md — compiler pipeline architecture
+language_guide.md — DostLang programming guide
+[NEW] 
+requirements.txt
+ply>=3.11
+graphviz>=0.20
+(Tkinter and SQLite are part of Python stdlib)
+Extra Features Included
+FeatureImplementation
+String concatenation+ operator overloaded for strings
+Array supportrakho arr = [1,2,3]; arr[0];
+Logical operatorsaur (and), ya (or), nahi (not)
+Constant foldingIR optimization pass
+Dead code eliminationIR optimization pass
+Verification Plan
+Automated Tests
+bash
+python -m pytest tests/ -v
+Manual Verification
+pip install -r requirements.txt → installs cleanly
+python main.py → GUI launches without errors
+Run the comprehensive example program → correct output
+Test all 20 example programs via CLI
+Verify AST visualization generates PNG
+Verify database stores execution history
+Test error reporting with intentional errors
+The user has approved the implementation plan. Let me now build the entire DostLang Compiler and Interpreter project. This is a massive project with 15+ files, so I'll use subagents to parallelize the work.
+Let me break this down into logical groups that can be built in parallel:
+Core Language Infrastructure (no dependencies): ast_nodes.py, symbol_table.py
+Lexer (depends on nothing): lexer.py
+Parser (depends on ast_nodes.py, lexer.py): parser.py
+Semantic Analyzer (depends on ast_nodes.py, symbol_table.py): semantic.py
+IR Generator (depends on ast_nodes.py): ir_generator.py
+Interpreter (depends on ast_nodes.py): interpreter.py
+Visualizer (depends on ast_nodes.py): visualizer.py
+Database (no dependencies): database.py
+GUI (depends on everything): gui.py
+Main (depends on everything): main.py
+Tests & Examples: tests/, examples/
+Documentation: README.md, docs/
+Requirements: requirements.txt
+I need to think carefully about the dependencies here since everything's tightly coupled. The parser needs the lexer and AST nodes, the semantic analyzer needs the symbol table and AST nodes, and so on. My best strategy is to build in phases: start with the foundational pieces like AST nodes, symbol table, and lexer, then move to the dependent modules like parser and semantic analyzer, then the integrating pieces like the visualizer and GUI. Within each phase I can parallelize work across subagents, but I need to maintain consistency across the interconnected files.
+The challenge with subagents is that they all need to write to the same directory and understand each other's interfaces precisely. I could split this into groups where subagent 1 handles the foundational files, subagent 2 builds the parser once it knows the exact lexer and AST interfaces, subagent 3 handles the semantic analysis and code generation, subagent 4 builds the GUI and main entry point, and subagent 5 creates examples, tests, and documentation. But the real bottleneck is making sure each subagent has the exact interface specifications from the previous group before they start writing.
+Actually, a cleaner approach is to define the key interfaces upfront—the AST node structure, lexer token types, and symbol table API—then let multiple subagents work in parallel with those specifications locked in. That way they can build their modules independently without waiting for each other.
+I'll split it into two waves: first, have one subagent handle the core compiler pipeline (AST nodes, symbol table, lexer, parser) while another builds the infrastructure pieces (database, visualizer, requirements). Then in the second wave, after those foundations are solid, I can have subagents tackle the semantic analysis, code generation, and interpreter. Defining the AST node classes... Defining more AST node classes... I'm reconsidering the approach—instead of handling everything myself, I should parallelize the work by launching multiple subagents simultaneously, each with detailed specifications for the AST nodes they'll need. I'm thinking of grouping the tightly coupled components together: one subagent handles the core parsing pipeline, another tackles the semantic analysis tools, and a third builds the interpreter with the necessary node specifications. subagents): 5. GUI + Main: gui.py, main.py 6. Content: examples/, tests/, docs/, README.md
+The subagents in wave 2 will need the AST node definitions from wave 1, so I'll include those in their prompts. I realize the self subagent type is already available, so I can invoke it directly. Now I'm planning out the exact line counts for each file to make sure the specs are detailed enough—ast_nodes.py around 150 lines, lexer.py around 200, parser.py around 400, and symbol_table.py around 100.
+The remaining files add up to over 3000 lines total across semantic analysis, IR generation, interpretation, visualization, database integration, the GUI, examples, tests, and documentation. I'll coordinate the subagents to work in parallel, making sure each one has the precise AST node definitions they need to reference. Right, the subagents don't need to import during creation—they just need consistent interface definitions. I'll embed the complete AST node definitions and API signatures in each prompt so everyone's working from the same spec. For subagent B, I need to specify the exact AST structure and attributes; for C, the AST nodes plus the symbol table methods like declare, lookup, push_scope, pop_scope; and D will need to know what data structures and APIs are available from the other modules.
+Actually, I'm reconsidering the grouping—maybe consolidating into 3 larger subagents makes more sense. Subagent A handles the core compiler pipeline (lexer, parser, AST), subagent B tackles all the analysis and execution (symbol table, semantic analysis, IR generation, interpreter), and subagent C covers the supporting tools (database, visualizer, examples, docs). Subagent C also handles all examples, documentation, and the README. For wave 2, I'm consolidating everything into a single subagent that covers the GUI, main integration, and tests. Before launching, I need to request write permissions for the project directory, create a task.md file to guide the subagents, then execute the waves sequentially and verify the results work together.
+The key constraint is ensuring all subagents use identical AST node definitions so there are no conflicts when their code integrates. I'm defining the base AST node classes...
+Defining AST node classes... Defining more AST node classes... Defining more AST node classes... Completing the symbol table interface methods, then I'm ready to launch three subagents with detailed prompts that specify exact file paths, content requirements, and the shared AST and symbol table interfaces they'll all need to reference.
+I'm realizing the parallelization challenge—since the subagents run simultaneously, they can't read files from each other. The solution is to embed the exact AST node and symbol table definitions directly in each subagent's prompt so they can write compatible code without waiting for dependencies.
+Let me map out the file dependencies to figure out the optimal parallelization strategy. Subagent A will handle the core pipeline components together since they're tightly coupled, Subagent B will build the analysis and execution layer with the AST definitions provided, and Subagent C will create all the support files including the database, visualizer, examples, and documentation. Then in Wave 2, Subagent D will integrate everything into the GUI and main entry point after the first wave completes.
+I need to set up the outputs directory with a .gitkeep file, finalize the AST node specification that I'll share across all subagents, then write out the detailed prompts before launching them. Adding array nodes and defining the token types for the language, then starting to sketch out the symbol table structure. I'm organizing the project into two waves based on dependencies—wave 1 handles the core language components and utilities that can be built independently, while wave 2 tackles the GUI and main entry point that depend on everything else, plus tests and documentation. I'll now write detailed prompts for each subagent to ensure they have all the context they need.
+For the lexer, I need to define the token rules precisely using PLY, including reserved words for the Hindustani language keywords and all the operators and delimiters. Then I'll work on the parser grammar with careful attention to operator precedence.
+Setting up operator precedence...
+Now I'm reconsidering how to split the work between subagents—since the core pipeline with AST nodes, lexer, and parser are the most critical components, maybe I should group those together in one subagent.
+I also need to handle PLY's parser table generation carefully, so I'll configure it to skip writing those files to disk during import. Let me finalize the subagent prompts and get started. I'm reconsidering whether to delegate this to subagents or just write all the files myself sequentially. Writing them directly gives me perfect consistency and lets me test incrementally, though it'll take more turns. Since I can make multiple parallel write_to_file calls per turn, I could create around five files at a time, so roughly four to five turns total to build out the twenty-plus files needed.
+Actually, using subagents makes more sense—I can split this into two waves and get it done faster. Let me define the subagent prompts and launch them.
+For wave 1, I'll have three subagents working in parallel: one on the core compiler pipeline (AST nodes, lexer, parser), another on analysis and execution (symbol table, semantic analysis, IR generation, interpreter), and a third handling infrastructure and content (database, visualizer, requirements, examples, and docs). Then in wave 2, I'll have one subagent integrate the GUI and main entry point, and another write the tests.
+Actually, I'm reconsidering this approach—with a compiler project where everything is tightly coupled, subagent mistakes could create cascading issues across files that are hard to debug. I think a hybrid approach makes more sense: I'll handle the foundational pieces myself (AST nodes, symbol table, database, requirements) to ensure they're solid, then launch subagents for the larger, more independent components with detailed specifications.
+But I keep flip-flopping on this. Let me just commit to using subagents across the board. The main risks are AST interface mismatches, import path problems, and quality issues—I can mitigate these by being explicit about class definitions and import statements in each prompt, then review and fix afterward. I'll go with three subagents in the first wave, then two more in the second wave.
+Now I need to write detailed prompts specifying exact file paths, import statements, AST node class names, the language spec with keywords and operators, and expected behavior. I'm going to create a task.md file and launch the first wave immediately—no more deliberating. The outputs directory will need a .gitkeep file, and I'll assign the core pipeline work (ast_nodes.py, lexer.py, parser.py) to Subagent A. the task.md file too. Actually, I should optimize this differently—using 4 subagents in wave 1 and 2 in wave 2 will be faster overall. Let me reorganize: wave 1 gets the core language files, analysis tools, support infrastructure, and all examples plus documentation, then wave 2 handles the GUI, main entry point, tests, and README. I'm going to merge the smaller groups to balance the workload better.
+Now I need to write the actual prompts for each subagent. Each one needs the project context, specific file paths to create, detailed requirements, and the shared interfaces like the AST node definitions that multiple subagents will depend on. I'm starting with a compact format for the AST node classes that all subagents can reference.
+Defining the AST node structure...
+I've got the core node types mapped out. Now I need to set up the outputs directory and clarify how the language constructs work—specifically that dikhao uses function call syntax with parentheses and a semicolon, pocho is just the keyword followed by an identifier and semicolon for input, and the whole program wraps in shuru and khatam blocks. So statements need semicolons, but control structures like jabtak (while), agar (if), and function definitions use braces without trailing semicolons. Variable declarations, assignments, function calls, and return statements all end with semicolons.
+I'm also noting that function call results can be assigned directly to variables, which means function calls work as expressions in this language.
+Now I need to decide whether dikhao is a special keyword with its own grammar rule or just a regular function call. Since the spec lists it as a keyword for output, I should treat it as a dedicated statement type rather than a generic function invocation, with its own parser rule that handles the print syntax.
+Similarly, pocho gets its own input statement rule. This aligns with having separate AST nodes for these operations instead of treating them as regular function calls.
+For the kaam keyword defining functions, the parameters are plain identifiers without type annotations, and the function body uses braces. Function calls then invoke these with arguments in parentheses, creating a FuncCallNode with the appropriate value assignment.
+Now I'm ready to structure the subagent prompts. I'll organize each one with context about the DostLang compiler, the specific files to create, detailed specifications for each component, shared interfaces like AST nodes and the symbol table, and important implementation notes around syntax rules and operator precedence. Let me draft these prompts carefully to ensure the subagents have everything they need. Now I'm ready to launch the three subagent prompts simultaneously and create the task.md file. I need to handle comment parsing in the lexer carefully—distinguishing between single-line comments starting with # and multi-line comments delimited by ###, where the lexer checks what follows the # character to determine which rule applies.
+I'll also support basic double-quoted strings and need to verify that semicolons are consistently required after dikhao statements based on the user's examples. Example: dikhao(name);" - with parentheses. So pocho takes just an identifier and semicolon, while dikhao is a function call with parentheses.
+Now I'm thinking through potential parser conflicts with PLY's LALR(1) parser. The main concerns are expression vs. statement ambiguity and assignment vs. expression ambiguity, but I can handle those by treating function calls followed by semicolons as statements and being careful with how I structure assignments.
+Looking at the user's spec, assignments without rakho use the pattern ID ASSIGN expr SEMICOLON, which is unambiguous. The tricky part is distinguishing between a function call statement and an assignment when both start with an ID token—the parser needs to look ahead to see if it's followed by = or (. That lookahead is built into LALR(1), so this should work fine.
+I'm defining separate grammar rules for assignments and function call statements in PLY. The key insight is that ID ASSIGN is structurally different from ID LPAREN, so there shouldn't be a shift-reduce conflict. But I need to be careful about how expr is defined, since it can also start with an ID, which might create ambiguity with the expr SEMICOLON pattern for expression 
+statements. To avoid a reduce-reduce conflict, I should make function calls only accessible through expressions and use expr SEMICOLON as the catch-all statement form for things like function calls. Now I'm laying out the full grammar structure with variable declarations, assignments, print statements, and other control flow rules. Adding more expression rules...
+Now I'm seeing a potential shift conflict between assignment statements and expressions that start with an identifier, since both can begin with ID. When the parser encounters ID with ASSIGN as the lookahead, it can shift to continue building an assignment or reduce ID to expr, but since ASSIGN can't follow expr in any rule, reducing would cause an error—so the parser shifts. For ID LPAREN, the parser recognizes this as the beginning of a function call and shifts accordingly, eventually reducing the complete func_call expression.
+I'm also checking that keywords like DIKHAO, POCHO, and RAKHO won't conflict with the ID-based rules since they're distinct token types. Now I need to verify the edge case between array_access and plain ID references.
+When the parser encounters ID LBRACKET, it should shift to build the array access rather than reducing the ID to an expression and then failing on the bracket. With shift-reduce conflict resolution favoring shift, this should work correctly.
+The grammar looks solid, so I'm ready to write out the prompts and get started. I should also consider how the language handles else if constructs—the spec shows nested agar blocks with warna for the else clause, so there's no explicit elif keyword; you'd nest conditionals instead.
+The if-else grammar rule is straightforward: agar followed by an expression and a block, optionally followed by warna and another block. Since warna is always followed by braces rather than another agar, there's no dangling-else ambiguity to worry about.
+Now I need to figure out what each subagent should focus on. The core pipeline subagent will need the full language specification including all keywords, operators, and grammar rules.
+The analysis and execution subagent depends on the AST node definitions from the first subagent, so it needs to know exactly what attributes each node has and how to import them properly.
+The infrastructure subagent can work more independently—it needs the AST definitions for the visualizer and the language spec for documentation and examples, but the database and requirements file are straightforward.
+I'm going to structure each prompt clearly with the task, project path, and specific requirements so the subagents know exactly what they're building and what dependencies they need to account for.
+I'm also noting that I need to be careful about the distinction between variable declarations and assignments in the grammar—rakho x = 5; should create a VarDeclNode, not an assignment.
+The semantic analyzer will enforce that declarations use the rakho keyword and don't redeclare existing variables, while assignments require the variable to already exist. I'm also planning to add array support as an extra feature, including array literals and access syntax.
+Adding array assignment support... FuncDefNode and FuncCallNode complete the function support, along with ReturnNode for control flow. I've got the array operations covered with ArrayLiteralNode, ArrayAccessNode, and ArrayAssignNode—that brings me to 20 node classes total, which should handle the full language spec.
+Now I'm thinking through the grammar for the dikhao print statement. I want to support both single and multiple arguments, so I'm defining it to accept a comma-separated expression list that can also be empty, allowing flexibility like dikhao(), dikhao(x), or dikhao(x, y, z).
+# DostLang Compiler — Implementation Tasks
+## Wave 1: Core Modules (Parallel)
+### Subagent A: Core Pipeline
+- [ ] ast_nodes.py — All 20 AST node classes
+- [ ] lexer.py — PLY lexical analyzer with all tokens
+- [ ] parser.py — PLY parser with complete grammar
+### Subagent B: Analysis & Execution
+- [ ] symbol_table.py — Scope-aware symbol table
+- [ ] semantic.py — Semantic analysis pass
+- [ ] ir_generator.py — Three-address code generator
+- [ ] interpreter.py — Tree-walking interpreter
+### Subagent C: Infrastructure & Content
+- [ ] database.py — SQLite execution history
+- [ ] visualizer.py — Graphviz AST visualization
+- [ ] requirements.txt
+- [ ] examples/ — 20 sample .dost programs
+- [ ] docs/ — grammar.md, architecture.md, language_guide.md
+- [ ] outputs/.gitkeep
+## Wave 2: Integration (After Wave 1)
+### Subagent D: GUI & Entry Point
+- [ ] gui.py — Tkinter IDE with all features
+- [ ] main.py — CLI/GUI entry point
+### Subagent E: Tests & README
+- [ ] tests/ — Unit and integration tests
+- [ ] README.md — Complete documentation
+## Wave 3: Verification
+- [ ] Install dependencies
+- [ ] Run all tests
+- [ ] Execute example programs
+- [ ] Verify GUI launches

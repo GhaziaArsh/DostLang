@@ -1,0 +1,17 @@
+shuru
+    # Function to calculate sum
+    kaam jamah(x, y) {
+        wapas x + y;
+    }
+
+    # Function without return value
+    kaam salam(name) {
+        dikhao("Salam,", name);
+    }
+
+    # Call functions
+    rakho result = jamah(15, 25);
+    dikhao("Sum result =", result);
+
+    salam("Ali");
+khatam
